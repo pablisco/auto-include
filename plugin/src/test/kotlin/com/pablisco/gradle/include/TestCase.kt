@@ -1,9 +1,9 @@
 package com.pablisco.gradle.include
 
-import com.pablisco.gradle.include.utils.createDirectories
-import com.pablisco.gradle.include.utils.deleteRecursively
-import com.pablisco.gradle.include.utils.readText
-import com.pablisco.gradle.include.utils.write
+import com.pablisco.gradle.auto.include.utils.createDirectories
+import com.pablisco.gradle.auto.include.utils.deleteRecursively
+import com.pablisco.gradle.auto.include.utils.readText
+import com.pablisco.gradle.auto.include.utils.write
 import org.jetbrains.kotlin.konan.file.recursiveCopyTo
 import java.nio.file.Path
 import java.nio.file.Paths

@@ -1,10 +1,10 @@
 package com.pablisco.gradle.auto.include
 
-import com.pablisco.gradle.include.utils.isDirectory
-import com.pablisco.gradle.include.utils.list
-import com.pablisco.gradle.include.utils.name
-import com.pablisco.gradle.include.utils.toGradlePath
-import com.pablisco.gradle.include.utils.walk
+import com.pablisco.gradle.auto.include.utils.isDirectory
+import com.pablisco.gradle.auto.include.utils.list
+import com.pablisco.gradle.auto.include.utils.name
+import com.pablisco.gradle.auto.include.utils.toGradlePath
+import com.pablisco.gradle.auto.include.utils.walk
 import java.nio.file.Path
 
 internal data class ModuleNode(

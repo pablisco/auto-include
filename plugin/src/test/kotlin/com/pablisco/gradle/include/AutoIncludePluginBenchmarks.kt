@@ -4,7 +4,7 @@ import com.pablisco.gradle.auto.include.filetree.FileTreeScope
 import com.pablisco.gradle.auto.include.filetree.fileTree
 import com.pablisco.gradle.include.gradle.defaultSettingsGradleScript
 import com.pablisco.gradle.include.gradle.runGradle
-import com.pablisco.gradle.include.utils.createDirectories
+import com.pablisco.gradle.auto.include.utils.createDirectories
 import org.junit.jupiter.api.Test
 import kotlin.system.measureTimeMillis
 
@@ -61,7 +61,7 @@ class AutoIncludePluginBenchmarks {
             }
 
             "Warm up - Manual build" { manualProjectDir.runGradle() }
-            "Warm up - AutoModule build" { autoModuleProjectDir.runGradle() }
+            "Warm up - AutoInclude build" { autoModuleProjectDir.runGradle() }
 
             "AutoModule build"(runCount = 10) { autoModuleProjectDir.runGradle() }
             "Manual build"(runCount = 10) { manualProjectDir.runGradle() }
@@ -71,7 +71,7 @@ class AutoIncludePluginBenchmarks {
 }
 
 private fun generateModules(): Modules =
-    (0..100).asSequence().map { "module$it" }
+    (0..1_000).asSequence().map { "module$it" }
 
 private fun FileTreeScope.manualSettings(modules: Modules) {
     "settings.gradle.kts" += modules

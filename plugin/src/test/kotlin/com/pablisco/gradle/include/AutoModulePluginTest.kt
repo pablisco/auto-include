@@ -4,19 +4,9 @@ import com.pablisco.gradle.auto.include.filetree.fileTree
 import com.pablisco.gradle.include.gradle.kotlinModule
 import com.pablisco.gradle.include.gradle.runGradleProjects
 import com.pablisco.gradle.include.gradle.shouldBeSuccess
-import com.pablisco.gradle.include.utils.createDirectories
-import com.pablisco.gradle.include.utils.deleteRecursively
-import com.pablisco.gradle.include.utils.readText
-import com.pablisco.gradle.include.utils.write
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldNotContain
-import org.jetbrains.kotlin.konan.file.recursiveCopyTo
 import org.junit.jupiter.api.Test
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardOpenOption
-import java.nio.file.attribute.FileTime
 
 class AutoIncludePluginTest {
 

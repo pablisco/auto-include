@@ -1,4 +1,4 @@
-package com.pablisco.gradle.include.utils
+package com.pablisco.gradle.auto.include.utils
 
 import java.io.InputStream
 import java.math.BigInteger

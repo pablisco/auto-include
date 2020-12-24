@@ -1,12 +1,17 @@
 package com.pablisco.gradle.auto.include
 
+import com.pablisco.gradle.auto.include.utils.isDirectory
 import com.pablisco.gradle.auto.include.utils.log
+import com.pablisco.gradle.auto.include.utils.name
+import com.pablisco.gradle.auto.include.utils.toGradlePath
+import com.pablisco.gradle.auto.include.utils.walk
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.buildscript
 import org.gradle.kotlin.dsl.maven
 import org.gradle.kotlin.dsl.repositories
 import java.io.File
+import java.nio.file.Path
 
 private const val version = "1.0"
 
@@ -17,8 +22,7 @@ public class AutoIncludePlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
         target.extensions.add("autoInclude", autoInclude)
         SettingsScope(autoInclude, target).whenEvaluated {
-            notifyIgnoredModules()
-            includeModulesToSettings()
+            includeModulesToSettings(autoInclude)
             includeBuildModules()
             addDebugArtifactRepository()
         }
@@ -63,17 +67,28 @@ private fun SettingsScope.whenEvaluated(f: SettingsScope.() -> Unit) {
     gradle.settingsEvaluated { f() }
 }
 
-private fun SettingsScope.notifyIgnoredModules() {
-    if (autoInclude.ignored.isNotEmpty()) {
-        log("Ignoring modules: ${autoInclude.ignored}")
-    }
+private fun Settings.includeModulesToSettings(autoInclude: AutoInclude) {
+    val root = rootDir.toPath()
+    root.walk()
+        .filterNot { it.name == "buildSrc" }
+        .filterNot { it.name.isEmpty() }
+        .filterNot { it.name.startsWith(".") }
+        .filterNot { it.isDirectory() }
+        .filter { it.isBuildScript() }
+        .map { root.relativize(it.parent).toGradlePath() }
+        .forEach { coordinates ->
+            if(autoInclude.ignored.any { ignore -> ignore(coordinates) }) {
+                log("Ignoring module: $coordinates")
+            } else {
+                include(coordinates)
+            }
+        }
 }
 
-private fun SettingsScope.includeModulesToSettings() {
-    rootModule.walk().mapNotNull { it.path }
-        .filterNot { path -> autoInclude.ignored.any { shouldIgnore -> shouldIgnore(path) } }
-        .forEach { path ->
-            log("include($path)")
-            include(path)
-        }
+private fun Path.isBuildScript() = when(name) {
+    "build.gradle.kts" -> true
+    "build.gradle" -> true
+    "$parent.gradle" -> true
+    "$parent.gradle.kts" -> true
+    else -> false
 }

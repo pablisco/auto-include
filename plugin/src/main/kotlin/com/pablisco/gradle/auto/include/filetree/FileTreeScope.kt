@@ -1,6 +1,6 @@
 package com.pablisco.gradle.auto.include.filetree
 
-import com.pablisco.gradle.include.utils.createDirectories
+import com.pablisco.gradle.auto.include.utils.createDirectories
 import java.nio.file.Files
 import java.nio.file.Path
 
