@@ -81,8 +81,6 @@ private val stopFolders = listOf<(File) -> Boolean>(
 private fun File.isBuildScript() = when (name) {
     "build.gradle.kts" -> true
     "build.gradle" -> true
-    "$parent.gradle" -> true
-    "$parent.gradle.kts" -> true
     else -> false
 }
 
