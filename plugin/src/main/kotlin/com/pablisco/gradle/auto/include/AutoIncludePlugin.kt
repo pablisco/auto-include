@@ -16,7 +16,7 @@ public class AutoIncludePlugin : Plugin<Settings> {
 
     override fun apply(target: Settings) {
         target.extensions.add("autoInclude", autoInclude)
-        target.whenEvaluated {
+        target.gradle.settingsEvaluated {
             val buildModulesRoot = rootDir.resolve(autoInclude.buildModulesRoot)
             candidateModules().forEach { dir ->
                 val coordinates = dir.relativeTo(rootDir).toGradlePath()
@@ -54,10 +54,6 @@ private fun Settings.addDebugArtifactRepository(autoInclude: AutoInclude) = grad
             gradlePluginPortal()
         }
     }
-}
-
-private fun Settings.whenEvaluated(f: Settings.() -> Unit) {
-    gradle.settingsEvaluated { f() }
 }
 
 private fun Settings.candidateModules(): Sequence<File> =
