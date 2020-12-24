@@ -1,9 +1,9 @@
-package com.pablisco.gradle.include
+package com.pablisco.gradle.auto.include
 
 import com.pablisco.gradle.auto.include.filetree.FileTreeScope
 import com.pablisco.gradle.auto.include.filetree.fileTree
-import com.pablisco.gradle.include.gradle.defaultSettingsGradleScript
-import com.pablisco.gradle.include.gradle.runGradle
+import com.pablisco.gradle.auto.include.gradle.defaultSettingsGradleScript
+import com.pablisco.gradle.auto.include.gradle.runGradle
 import com.pablisco.gradle.auto.include.utils.createDirectories
 import org.junit.jupiter.api.Test
 import kotlin.system.measureTimeMillis
@@ -63,7 +63,7 @@ class AutoIncludePluginBenchmarks {
             "Warm up - Manual build" { manualProjectDir.runGradle() }
             "Warm up - AutoInclude build" { autoModuleProjectDir.runGradle() }
 
-            "AutoModule build"(runCount = 10) { autoModuleProjectDir.runGradle() }
+            "AutoInclude build"(runCount = 10) { autoModuleProjectDir.runGradle() }
             "Manual build"(runCount = 10) { manualProjectDir.runGradle() }
         }
     }

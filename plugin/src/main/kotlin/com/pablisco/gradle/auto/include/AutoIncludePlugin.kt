@@ -1,17 +1,12 @@
 package com.pablisco.gradle.auto.include
 
-import com.pablisco.gradle.auto.include.utils.isDirectory
 import com.pablisco.gradle.auto.include.utils.log
-import com.pablisco.gradle.auto.include.utils.name
-import com.pablisco.gradle.auto.include.utils.toGradlePath
-import com.pablisco.gradle.auto.include.utils.walk
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.buildscript
 import org.gradle.kotlin.dsl.maven
 import org.gradle.kotlin.dsl.repositories
 import java.io.File
-import java.nio.file.Path
 
 private const val version = "1.0"
 
@@ -21,16 +16,38 @@ public class AutoIncludePlugin : Plugin<Settings> {
 
     override fun apply(target: Settings) {
         target.extensions.add("autoInclude", autoInclude)
-        SettingsScope(autoInclude, target).whenEvaluated {
-            includeModulesToSettings(autoInclude)
-            includeBuildModules()
-            addDebugArtifactRepository()
+        target.whenEvaluated {
+            val buildModulesRoot = rootDir.resolve(autoInclude.buildModulesRoot)
+            candidateModules().forEach { dir ->
+                val coordinates = dir.relativeTo(rootDir).toGradlePath()
+                when {
+                    autoInclude.shouldIgnore(coordinates) -> log("Ignoring module: $coordinates")
+                    dir.startsWith(buildModulesRoot) -> includeBuildModule(dir)
+                    else -> include(coordinates)
+                }
+            }
+            addDebugArtifactRepository(autoInclude)
         }
     }
-
 }
 
-private fun SettingsScope.addDebugArtifactRepository() = gradle.rootProject {
+private fun Settings.includeBuildModule(dir: File) {
+    log("Including build module: $dir")
+    includeBuild(dir) {
+        dependencySubstitution {
+            substitute(module("gradle:${dir.name}:local")).with(project(":"))
+        }
+    }
+    gradle.rootProject {
+        buildscript {
+            dependencies {
+                classpath("gradle:${dir.name}:local")
+            }
+        }
+    }
+}
+
+private fun Settings.addDebugArtifactRepository(autoInclude: AutoInclude) = gradle.rootProject {
     buildscript {
         repositories {
             autoInclude.pluginRepository?.let { maven(url = it) }
@@ -39,56 +56,39 @@ private fun SettingsScope.addDebugArtifactRepository() = gradle.rootProject {
     }
 }
 
-private fun SettingsScope.includeBuildModules() {
-    val buildModulesRoot = rootDir.resolve(autoInclude.buildModulesRoot)
-
-    val buildModules = buildModulesRoot.children()
-        .filter { it.isDirectory }
-        .filter { dir -> dir.children().any { it.name == "build.gradle.kts" } }
-    buildModules.forEach { dir ->
-        includeBuild(dir) {
-            dependencySubstitution {
-                substitute(module("gradle:${dir.name}:local")).with(project(":"))
-            }
-        }
-        gradle.rootProject {
-            buildscript {
-                dependencies {
-                    classpath("gradle:${dir.name}:local")
-                }
-            }
-        }
-    }
-}
-
-private fun File.children(): List<File> = listFiles()?.toList() ?: emptyList()
-
-private fun SettingsScope.whenEvaluated(f: SettingsScope.() -> Unit) {
+private fun Settings.whenEvaluated(f: Settings.() -> Unit) {
     gradle.settingsEvaluated { f() }
 }
 
-private fun Settings.includeModulesToSettings(autoInclude: AutoInclude) {
-    val root = rootDir.toPath()
-    root.walk()
-        .filterNot { it.name == "buildSrc" }
-        .filterNot { it.name.isEmpty() }
-        .filterNot { it.name.startsWith(".") }
-        .filterNot { it.isDirectory() }
+private fun Settings.candidateModules(): Sequence<File> =
+    rootDir.walkTopDown()
+        .onEnter { !it.shouldStop() }
+        .filterNot { it.isDirectory }
         .filter { it.isBuildScript() }
-        .map { root.relativize(it.parent).toGradlePath() }
-        .forEach { coordinates ->
-            if(autoInclude.ignored.any { ignore -> ignore(coordinates) }) {
-                log("Ignoring module: $coordinates")
-            } else {
-                include(coordinates)
-            }
-        }
-}
+        .map { it.parentFile }
+        .filterNot { it == rootDir }
 
-private fun Path.isBuildScript() = when(name) {
+private fun File.shouldStop() = stopFolders.any { shouldStop -> shouldStop(this) }
+
+private fun AutoInclude.shouldIgnore(coordinates: String) =
+    ignored.any { ignore -> ignore(coordinates) }
+
+private val stopFolders = listOf<(File) -> Boolean>(
+    { "buildSrc" == it.name },
+    { it.name.isEmpty() },
+    { it.name.startsWith(".") },
+    { "build" == it.name },
+    { "src" == it.name },
+    { "out" == it.name }
+)
+
+private fun File.isBuildScript() = when (name) {
     "build.gradle.kts" -> true
     "build.gradle" -> true
     "$parent.gradle" -> true
     "$parent.gradle.kts" -> true
     else -> false
 }
+
+internal fun File.toGradlePath(): String =
+    ':' + path.replace(File.separatorChar, ':')

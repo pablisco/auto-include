@@ -1,9 +1,9 @@
-package com.pablisco.gradle.include
+package com.pablisco.gradle.auto.include
 
 import com.pablisco.gradle.auto.include.filetree.fileTree
-import com.pablisco.gradle.include.gradle.kotlinModule
-import com.pablisco.gradle.include.gradle.runGradleProjects
-import com.pablisco.gradle.include.gradle.shouldBeSuccess
+import com.pablisco.gradle.auto.include.gradle.kotlinModule
+import com.pablisco.gradle.auto.include.gradle.runGradleProjects
+import com.pablisco.gradle.auto.include.gradle.shouldBeSuccess
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldNotContain
 import org.junit.jupiter.api.Test

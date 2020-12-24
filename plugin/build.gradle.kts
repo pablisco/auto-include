@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id("de.fayard.refreshVersions")
     kotlin("jvm")
@@ -32,6 +34,7 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = "1.8"
+            languageVersion = "1.4"
         }
     }
 

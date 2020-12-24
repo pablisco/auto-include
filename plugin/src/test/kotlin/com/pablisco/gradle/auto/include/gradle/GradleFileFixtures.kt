@@ -1,4 +1,4 @@
-package com.pablisco.gradle.include.gradle
+package com.pablisco.gradle.auto.include.gradle
 
 import com.pablisco.gradle.auto.include.filetree.FileTreeScope
 

@@ -1,4 +1,4 @@
-package com.pablisco.gradle.include.gradle
+package com.pablisco.gradle.auto.include.gradle
 
 import org.amshove.kluent.shouldBeEqualTo
 import org.gradle.testkit.runner.BuildResult
