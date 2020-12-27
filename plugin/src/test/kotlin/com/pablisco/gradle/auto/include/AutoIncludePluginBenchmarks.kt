@@ -8,8 +8,6 @@ import com.pablisco.gradle.auto.include.utils.createDirectories
 import org.junit.jupiter.api.Test
 import kotlin.system.measureTimeMillis
 
-private typealias Modules = Sequence<String>
-
 class AutoIncludePluginBenchmarks {
 
     @Test
@@ -63,23 +61,23 @@ class AutoIncludePluginBenchmarks {
             "Warm up - Manual build" { manualProjectDir.runGradle() }
             "Warm up - AutoInclude build" { autoModuleProjectDir.runGradle() }
 
-            "AutoInclude build"(runCount = 10) { autoModuleProjectDir.runGradle() }
             "Manual build"(runCount = 10) { manualProjectDir.runGradle() }
+            "AutoInclude build"(runCount = 10) { autoModuleProjectDir.runGradle() }
         }
     }
 
 }
 
-private fun generateModules(): Modules =
+private fun generateModules(): Sequence<String> =
     (0..1_000).asSequence().map { "module$it" }
 
-private fun FileTreeScope.manualSettings(modules: Modules) {
+private fun FileTreeScope.manualSettings(modules: Sequence<String>) {
     "settings.gradle.kts" += modules
         .asManualNotation()
         .joinToString("\n") { """include($it)""" }
 }
 
-private fun FileTreeScope.createModules(modules: Modules) {
+private fun FileTreeScope.createModules(modules: Sequence<String>) {
     modules.forEach { moduleName ->
         moduleName {
             emptyFile("build.gradle.kts")
@@ -90,7 +88,7 @@ private fun FileTreeScope.createModules(modules: Modules) {
 private fun dependencies(modules: Sequence<String>): String =
     modules.joinToString("\n") { """implementation(project($it))""" }
 
-private fun Modules.asManualNotation(): Sequence<String> =
+private fun Sequence<String>.asManualNotation(): Sequence<String> =
     map { "\":$it\"" }
 
 private fun measure(block: MeasureScope.() -> Unit) {
