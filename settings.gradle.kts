@@ -1,5 +1,3 @@
-
-
 rootProject.name = "auto-include"
 
 pluginManagement {
