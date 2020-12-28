@@ -1,14 +1,20 @@
 package com.pablisco.gradle.auto.include
 
+import com.pablisco.gradle.auto.include.VIPaths.build
+import com.pablisco.gradle.auto.include.VIPaths.buildSrc
+import com.pablisco.gradle.auto.include.VIPaths.groovyBuildScript
+import com.pablisco.gradle.auto.include.VIPaths.kotlinBuildScript
+import com.pablisco.gradle.auto.include.VIPaths.out
+import com.pablisco.gradle.auto.include.VIPaths.src
 import com.pablisco.gradle.auto.include.utils.log
+import com.pablisco.gradle.auto.include.utils.walk
 import org.gradle.api.Plugin
 import org.gradle.api.initialization.Settings
 import org.gradle.kotlin.dsl.buildscript
 import org.gradle.kotlin.dsl.maven
 import org.gradle.kotlin.dsl.repositories
-import java.io.File
-
-private const val version = "1.0"
+import java.nio.file.Path
+import java.nio.file.Paths
 
 public class AutoIncludePlugin : Plugin<Settings> {
 
@@ -17,31 +23,43 @@ public class AutoIncludePlugin : Plugin<Settings> {
     override fun apply(target: Settings) {
         target.extensions.add("autoInclude", autoInclude)
         target.gradle.settingsEvaluated {
-            val buildModulesRoot = rootDir.resolve(autoInclude.buildModulesRoot)
-            candidateModules().forEach { dir ->
-                val coordinates = dir.relativeTo(rootDir).toGradlePath()
-                when {
-                    autoInclude.shouldIgnore(coordinates) -> log("Ignoring module: $coordinates")
-                    dir.startsWith(buildModulesRoot) -> includeBuildModule(dir)
-                    else -> include(coordinates)
-                }
-            }
+            includeModules(autoInclude)
             addDebugArtifactRepository(autoInclude)
         }
     }
 }
 
-private fun Settings.includeBuildModule(dir: File) {
+private fun Settings.includeModules(autoInclude: AutoInclude) {
+    val root = rootDir.toPath()
+    val buildModulesRoot = root.resolve(autoInclude.buildModulesRoot)
+    root.walk(
+        onEachFile = { file ->
+            if (file.isBuildScript() && file.parent != root) {
+                val module = file.parent
+                val coordinates = root.relativize(module).toGradleNotation()
+                when {
+                    autoInclude.shouldIgnore(coordinates) -> log("Ignoring module: $coordinates")
+                    module.startsWith(buildModulesRoot) -> includeBuildModule(module)
+                    else -> include(coordinates)
+                }
+            }
+        },
+        continueWhen = { dir -> !dir.shouldStop() }
+    )
+}
+
+private fun Settings.includeBuildModule(dir: Path) {
     log("Including build module: $dir")
+    val notation = "gradle:${dir.fileName}:local"
     includeBuild(dir) {
         dependencySubstitution {
-            substitute(module("gradle:${dir.name}:local")).with(project(":"))
+            substitute(module(notation)).with(project(":"))
         }
     }
     gradle.rootProject {
         buildscript {
             dependencies {
-                classpath("gradle:${dir.name}:local")
+                classpath(notation)
             }
         }
     }
@@ -56,33 +74,34 @@ private fun Settings.addDebugArtifactRepository(autoInclude: AutoInclude) = grad
     }
 }
 
-private fun Settings.candidateModules(): Sequence<File> =
-    rootDir.walkTopDown()
-        .onEnter { !it.shouldStop() }
-        .filterNot { it.isDirectory }
-        .filter { it.isBuildScript() }
-        .map { it.parentFile }
-        .filterNot { it == rootDir }
-
-private fun File.shouldStop() = stopFolders.any { shouldStop -> shouldStop(this) }
+private fun Path.shouldStop() = stopFolders.any { shouldStop -> shouldStop(this) }
 
 private fun AutoInclude.shouldIgnore(coordinates: String) =
     ignored.any { ignore -> ignore(coordinates) }
 
-private val stopFolders = listOf<(File) -> Boolean>(
-    { "buildSrc" == it.name },
-    { it.name.isEmpty() },
-    { it.name.startsWith(".") },
-    { "build" == it.name },
-    { "src" == it.name },
-    { "out" == it.name }
+private val stopFolders = listOf<(Path) -> Boolean>(
+    { it.fileName == buildSrc },
+    { it.fileName.nameCount == 0 },
+    { it.fileName == build },
+    { it.fileName == src },
+    { it.fileName == out }
 )
 
-private fun File.isBuildScript() = when (name) {
-    "build.gradle.kts" -> true
-    "build.gradle" -> true
+private object VIPaths {
+    val buildSrc: Path = Paths.get("buildSrc")
+    val build: Path = Paths.get("build")
+    val src: Path = Paths.get("src")
+    val out: Path = Paths.get("out")
+    val kotlinBuildScript: Path = Paths.get("build.gradle.kts")
+    val groovyBuildScript: Path = Paths.get("build.gradle")
+}
+
+private fun Path.isBuildScript() = when {
+    fileName == kotlinBuildScript -> true
+    fileName == groovyBuildScript -> true
+    endsWith(parent.resolve("${parent.fileName}.gradle.kts")) -> true
+    endsWith(parent.resolve("${parent.fileName}.gradle")) -> true
     else -> false
 }
 
-internal fun File.toGradlePath(): String =
-    ':' + path.replace(File.separatorChar, ':')
+internal fun Path.toGradleNotation(): String = joinToString(separator = ":", prefix = ":")

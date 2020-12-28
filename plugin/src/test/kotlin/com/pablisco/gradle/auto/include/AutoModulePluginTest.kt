@@ -25,7 +25,15 @@ class AutoIncludePluginTest {
     @Test
     fun `generates modules code WITH nested modules`() = testCase("nested_modules") {
         val result = workingDir.runGradleProjects()
+
         result.shouldBeSuccess()
+
+        val output = workingDir.runGradleProjects().output
+        output shouldContain "Project ':consumer'"
+        output shouldContain "Project ':group'"
+        output shouldContain "Project ':group:library'"
+        output shouldContain "Project ':group:library:nested'"
+        output shouldContain "Project ':library'"
     }
 
     @Test
@@ -45,9 +53,9 @@ class AutoIncludePluginTest {
     }
 
     @Test
-    fun `files are generated after changing script with cache enabled`() = testCase(
+    fun `new module is included`() = testCase(
         path = "simple_module",
-        workingPath = "files_are_generated_after_script_changes"
+        workingPath = "new_module_is_included"
     ) {
         workingDir.runGradleProjects()
 
