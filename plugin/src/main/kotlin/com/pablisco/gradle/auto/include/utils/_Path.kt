@@ -8,9 +8,6 @@ import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.attribute.FileAttribute
 
-internal fun Path.directoryStream(filter: (Path) -> Boolean): Sequence<Path> =
-    Files.newDirectoryStream(this, filter).asSequence()
-
 internal fun Path.walk(
     onEachFile: (Path) -> Unit,
     continueWhen: (Path) -> Boolean
@@ -26,8 +23,6 @@ internal fun Path.walk(
     }
 })
 
-internal fun Path.isDirectory() = Files.isDirectory(this)
-
 internal fun Path.readText(): String = Files.readAllLines(this).joinToString("\n")
 
 internal fun Path.write(bytes: ByteArray, vararg openOption: OpenOption): Path =
@@ -39,5 +34,3 @@ internal fun Path.write(string: String, vararg openOption: OpenOption): Path =
 internal fun Path.createDirectories(
     vararg fileAttributes: FileAttribute<*> = emptyArray()
 ): Path = Files.createDirectories(this, *fileAttributes)
-
-internal fun Path.exists() = Files.exists(this)
