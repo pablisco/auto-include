@@ -11,19 +11,35 @@ import org.junit.jupiter.api.Test
 class AutoIncludePluginTest {
 
     @Test
-    fun `generates modules code WITH simple module`() = testCase("simple_module") {
+    fun `includes modules code WITH simple module`() = testCase("simple_module") {
         val result = workingDir.runGradleProjects()
         result.shouldBeSuccess()
     }
 
     @Test
-    fun `generates modules code WITH multiple modules`() = testCase("multiple_modules") {
+    fun `includes modules code WITH multiple modules`() = testCase("multiple_modules") {
         val result = workingDir.runGradleProjects()
+
         result.shouldBeSuccess()
+        val output = workingDir.runGradleProjects().output
+        output shouldContain "Project ':consumer'"
+        output shouldContain "Project ':libraryOne'"
+        output shouldContain "Project ':libraryTwo'"
     }
 
     @Test
-    fun `generates modules code WITH nested modules`() = testCase("nested_modules") {
+    fun `includes modules code WITH module name scripts`() = testCase("custom_script_modules") {
+        val result = workingDir.runGradleProjects()
+
+        result.shouldBeSuccess()
+        val output = workingDir.runGradleProjects().output
+        output shouldContain "Project ':consumer'"
+        output shouldContain "Project ':libraryOne'"
+        output shouldContain "Project ':libraryTwo'"
+    }
+
+    @Test
+    fun `includes modules code WITH nested modules`() = testCase("nested_modules") {
         val result = workingDir.runGradleProjects()
 
         result.shouldBeSuccess()
