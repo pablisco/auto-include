@@ -1,4 +1,4 @@
-# Auto Module
+# Auto Include
 
 [![Actions](https://github.com/pablisco/auto-include/workflows/Publish/badge.svg)](https://github.com/pablisco/auto-include/actions) 
 [![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/com/pablisco/gradle/auto-include/plugin/maven-metadata.xml.svg?label=Gradle)](https://plugins.gradle.org/plugin/com.pablisco.gradle.auto.include)
@@ -28,7 +28,7 @@ Remove all your `include()` instructions inside `settings.gradle[.kts]` and add 
 
 ```kotlin
 plugins {
-    id("com.pablisco.gradle.auto.include") version "1.0"
+    id("com.pablisco.gradle.auto.include") version "1.1"
 }
 ```
 
