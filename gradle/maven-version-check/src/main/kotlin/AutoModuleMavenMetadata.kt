@@ -7,7 +7,7 @@ object AutoModuleMavenMetadata {
     val versions: List<String> by lazy {
         runBlocking {
             MavenMetadataApi.gradlePlugins
-                .pluginMetadata(Plugin("com.pablisco.gradle.automodule"))
+                .pluginMetadata(Plugin("com.pablisco.gradle.auto.include"))
                 .versioning.versions
         }
     }
