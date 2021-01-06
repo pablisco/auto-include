@@ -1,7 +1,7 @@
 # Auto Include
 
 [![Actions](https://github.com/pablisco/auto-include/workflows/Publish/badge.svg)](https://github.com/pablisco/auto-include/actions) 
-[![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v/https/plugins.gradle.org/m2/com/pablisco/gradle/auto-include/plugin/maven-metadata.xml.svg?label=Gradle)](https://plugins.gradle.org/plugin/com.pablisco.gradle.auto.include)
+[![Gradle Plugin Portal](https://img.shields.io/maven-metadata/v.svg?label=Gradle&metadataUrl=https%3A%2F%2Fplugins.gradle.org%2Fm2%2Fcom%2Fpablisco%2Fgradle%2Fauto%2Finclude%2Fplugin%2Fmaven-metadata.xml)](https://plugins.gradle.org/plugin/com.pablisco.gradle.auto.include)
 
 A Gradle plugin that help you not have to include any modules manually in your settings file.
 
