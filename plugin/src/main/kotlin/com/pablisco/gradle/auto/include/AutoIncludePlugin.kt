@@ -6,6 +6,9 @@ import com.pablisco.gradle.auto.include.VIPaths.groovyBuildScript
 import com.pablisco.gradle.auto.include.VIPaths.kotlinBuildScript
 import com.pablisco.gradle.auto.include.VIPaths.out
 import com.pablisco.gradle.auto.include.VIPaths.src
+import com.pablisco.gradle.auto.include.utils.isHidden
+import com.pablisco.gradle.auto.include.utils.isReadable
+import com.pablisco.gradle.auto.include.utils.isSymbolicLink
 import com.pablisco.gradle.auto.include.utils.log
 import com.pablisco.gradle.auto.include.utils.walk
 import org.gradle.api.Plugin
@@ -82,8 +85,9 @@ private fun AutoInclude.shouldIgnore(coordinates: String) =
 private val stopFolders = listOf<(Path) -> Boolean>(
     { it.fileName == buildSrc },
     { it.fileName.nameCount == 0 },
-    { it.fileName.startsWith(".") },
-    { it.fileName.endsWith(".") },
+    { it.isHidden() },
+    { it.isSymbolicLink() },
+    { !it.isReadable() },
     { it.fileName == build },
     { it.fileName == src },
     { it.fileName == out }

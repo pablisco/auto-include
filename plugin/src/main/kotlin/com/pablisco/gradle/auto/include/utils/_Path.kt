@@ -34,3 +34,9 @@ internal fun Path.write(string: String, vararg openOption: OpenOption): Path =
 internal fun Path.createDirectories(
     vararg fileAttributes: FileAttribute<*> = emptyArray()
 ): Path = Files.createDirectories(this, *fileAttributes)
+
+internal fun Path.isHidden() = Files.isHidden(this)
+
+internal fun Path.isSymbolicLink() = Files.isSymbolicLink(this)
+
+internal fun Path.isReadable() = Files.isReadable(this)
