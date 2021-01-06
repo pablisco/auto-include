@@ -82,6 +82,8 @@ private fun AutoInclude.shouldIgnore(coordinates: String) =
 private val stopFolders = listOf<(Path) -> Boolean>(
     { it.fileName == buildSrc },
     { it.fileName.nameCount == 0 },
+    { it.fileName.startsWith(".") },
+    { it.fileName.endsWith(".") },
     { it.fileName == build },
     { it.fileName == src },
     { it.fileName == out }
