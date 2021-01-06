@@ -76,10 +76,10 @@ The code will automatically be added to the classpath of the build script.
 If you want to make sure a module *is not* included to the Gradle graph you can do it in two ways:
 
 1. Adding the `.ignore` extension at the end of the `build.gradle[.kts]` script.
-2. Inside `settings.gradle[.kts]` you can configure `auto.include` to do so:
+2. Inside `settings.gradle[.kts]` you can configure `autoInclude` to do so:
 
 ```kotlin
-auto.include {
+autoInclude {
   ignore(":modulePath", ":some:other:module")
 }
 ```
