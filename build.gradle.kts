@@ -17,7 +17,7 @@ allprojects {
         mavenCentral()
     }
     group = "com.pablisco.gradle.auto.include"
-    version = "1.1"
+    version = "1.2"
 }
 
 tasks {

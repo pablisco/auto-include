@@ -28,7 +28,7 @@ Remove all your `include()` instructions inside `settings.gradle[.kts]` and add 
 
 ```kotlin
 plugins {
-    id("com.pablisco.gradle.auto.include") version "1.1"
+    id("com.pablisco.gradle.auto.include") version "1.2"
 }
 ```
 
