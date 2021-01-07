@@ -57,6 +57,7 @@ class AutoIncludePluginTest {
         val result = workingDir.runGradleProjects()
 
         result.output shouldNotContain "Project ':settingsKtIgnored'"
+        result.output shouldNotContain "Project ':settingsKtIgnored:nestedIgnored'"
         result.output shouldNotContain "Project ':extensionIgnored'"
         result.output shouldContain "Project ':included'"
     }

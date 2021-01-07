@@ -47,7 +47,12 @@ private fun Settings.includeModules(autoInclude: AutoInclude) {
                 }
             }
         },
-        continueWhen = { dir -> !dir.shouldStop() }
+        continueWhen = { dir ->
+            val coordinates = root.relativize(dir).toGradleNotation()
+            !dir.shouldStop() && !autoInclude.shouldIgnore(coordinates).also { ignore ->
+                if (ignore) log("Ignoring module: $coordinates")
+            }
+        }
     )
 }
 
