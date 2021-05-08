@@ -45,7 +45,7 @@ build script. It's quite common to use that to define versions values, specially
 kotlin DSL as it provide auto-complete.
 
 The problem with buildSrc is that it doesn't use cache, and it's compiled and tested (if you have tests) 
-every time you run your build. You can read more about this on this article. A better alternative is to 
+every time you run your build. You can read more about this on [this article](https://medium.com/bumble-tech/how-to-use-composite-builds-as-a-replacement-of-buildsrc-in-gradle-64ff99344b58). A better alternative is to 
 use composite builds.
 
 They are also run before the main build script, with the added benefit of using build cache and allowing 
